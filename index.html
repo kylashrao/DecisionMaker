@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instant Decision Wheel | Yes or No & Custom Decision Maker</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+</head>
+
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col justify-between select-none">
+
+    <!-- Header -->
+    <header
+        class="p-4 md:px-8 flex items-center justify-between border-b border-slate-800 bg-slate-900/80 sticky top-0 z-30 backdrop-blur">
+        <div class="flex items-center gap-2">
+            <div
+                class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center font-black text-white">
+                D</div>
+            <h1 class="text-xl font-extrabold tracking-tight text-indigo-400">DecisionMaker<span
+                    class="text-white">.io</span></h1>
+        </div>
+        <nav class="hidden md:flex items-center gap-6 text-sm text-slate-400">
+            <button onclick="openModal('faqModal')" class="hover:text-indigo-400 transition">FAQ</button>
+            <button onclick="openModal('aboutModal')" class="hover:text-indigo-400 transition">About</button>
+            <button onclick="openModal('privacyModal')" class="hover:text-indigo-400 transition">Privacy Policy</button>
+            <button onclick="openModal('contactModal')" class="hover:text-indigo-400 transition">Contact</button>
+        </nav>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 max-w-5xl w-full mx-auto p-4 md:p-8 flex flex-col items-center justify-center gap-8">
+
+        <div class="text-center">
+            <h2 class="text-2xl md:text-3xl font-black text-white">Yes or No Picker Wheel</h2>
+            <p class="text-slate-400 text-sm mt-1">Spin the wheel to get your instant decision outcome.</p>
+        </div>
+
+        <div class="flex flex-col lg:flex-row items-center justify-center gap-8 w-full max-w-4xl">
+            <!-- Wheel Section -->
+            <div class="relative flex flex-col items-center">
+                <!-- Pointer -->
+                <div
+                    class="absolute -top-4 z-10 w-0 h-0 border-l-[15px] border-l-transparent border-r-[15px] border-r-transparent border-t-[25px] border-t-red-500 drop-shadow-md">
+                </div>
+
+                <canvas id="wheelCanvas" width="340" height="340"
+                    class="rounded-full shadow-2xl border-4 border-slate-700 cursor-pointer bg-slate-950"></canvas>
+
+                <button id="spinBtn"
+                    class="mt-6 px-10 py-3.5 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-bold text-lg rounded-full shadow-lg hover:opacity-90 active:scale-95 transition transform">
+                    SPIN THE WHEEL!
+                </button>
+            </div>
+
+            <!-- Controls / Customization Section -->
+            <div
+                class="bg-slate-800 p-6 rounded-2xl shadow-xl w-full max-w-md border border-slate-700 flex flex-col justify-between">
+                <div>
+                    <h3 class="text-lg font-bold mb-2 text-indigo-300">Customize Options</h3>
+                    <p class="text-xs text-slate-400 mb-3">Enter choices separated by commas:</p>
+
+                    <textarea id="optionsInput" rows="3"
+                        class="w-full bg-slate-900 border border-slate-700 rounded-lg p-3 text-sm text-slate-200 focus:outline-none focus:border-indigo-500 mb-3">Yes, No, Definitely, Absolutely Not</textarea>
+
+                    <button id="updateBtn"
+                        class="w-full py-2.5 bg-slate-700 hover:bg-slate-600 font-semibold rounded-lg text-sm transition mb-4">
+                        Update Wheel
+                    </button>
+                </div>
+
+                <!-- Result Display Box & Share Action -->
+                <div id="resultBox" class="p-4 bg-slate-900 rounded-xl border border-slate-700 text-center hidden">
+                    <span class="text-xs text-slate-400 uppercase tracking-widest block">Winning Result</span>
+                    <span id="resultText" class="text-2xl font-black text-emerald-400 mt-1 block">---</span>
+
+                    <div class="mt-4 flex items-center justify-center gap-2">
+                        <button onclick="shareResult()"
+                            class="flex-1 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold rounded-lg transition flex items-center justify-center gap-1.5">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                            </svg>
+                            Share Result
+                        </button>
+                        <button onclick="copyResultText()"
+                            class="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-lg transition border border-slate-700">
+                            Copy
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Simulated Responsive Banner Ad Placeholder -->
+        <div
+            class="w-full max-w-4xl h-24 bg-slate-800/50 border border-dashed border-slate-700 rounded-xl flex items-center justify-center text-slate-500 text-xs tracking-wider uppercase">
+            Advertisement Space (Google AdSense Responsive Unit)
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer
+        class="p-6 text-center text-xs text-slate-500 border-t border-slate-800 flex flex-col md:flex-row items-center justify-between max-w-5xl mx-auto w-full gap-4">
+        <div>&copy; 2026 DecisionMaker.io. All rights reserved.</div>
+        <div class="flex items-center gap-4">
+            <button onclick="openModal('faqModal')" class="hover:text-slate-300">FAQ</button>
+            <button onclick="openModal('aboutModal')" class="hover:text-slate-300">About</button>
+            <button onclick="openModal('privacyModal')" class="hover:text-slate-300">Privacy</button>
+            <button onclick="openModal('contactModal')" class="hover:text-slate-300">Contact</button>
+        </div>
+    </footer>
+
+    <!-- Modals -->
+    <div id="faqModal"
+        class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div
+            class="bg-slate-800 border border-slate-700 w-full max-w-lg rounded-2xl p-6 relative max-h-[80vh] overflow-y-auto">
+            <h3 class="text-xl font-bold text-white mb-3">Frequently Asked Questions</h3>
+            <div class="space-y-4 text-sm text-slate-300">
+                <div>
+                    <h4 class="font-semibold text-indigo-300">Is the wheel completely random?</h4>
+                    <p class="text-xs text-slate-400 mt-1">Yes, the wheel uses pseudo-random algorithms combined with
+                        random starting torque to guarantee unbiased outcomes.</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-indigo-300">Can I use custom text items?</h4>
+                    <p class="text-xs text-slate-400 mt-1">Absolutely! Simply modify the text box on the right panel
+                        with comma-separated values to create personalized wheels.</p>
+                </div>
+                <div>
+                    <h4 class="font-semibold text-indigo-300">Is this tool free?</h4>
+                    <p class="text-xs text-slate-400 mt-1">Yes, DecisionMaker.io is 100% free to use for personal,
+                        educational, and professional decisions.</p>
+                </div>
+            </div>
+            <button onclick="closeModal('faqModal')"
+                class="mt-6 w-full py-2.5 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg text-sm">Close</button>
+        </div>
+    </div>
+
+    <div id="aboutModal"
+        class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div
+            class="bg-slate-800 border border-slate-700 w-full max-w-lg rounded-2xl p-6 relative max-h-[80vh] overflow-y-auto">
+            <h3 class="text-xl font-bold text-white mb-3">About DecisionMaker.io</h3>
+            <p class="text-sm text-slate-300 leading-relaxed">
+                DecisionMaker.io is a lightweight, ultra-fast online utility platform designed to solve daily
+                micro-dilemmas instantly. Whether you are settling yes/no questions, picking classroom student names, or
+                choosing what to eat for dinner, our interactive spinners make decision-making fast, fun, and fair.
+            </p>
+            <button onclick="closeModal('aboutModal')"
+                class="mt-6 w-full py-2.5 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg text-sm">Close</button>
+        </div>
+    </div>
+
+    <div id="privacyModal"
+        class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div
+            class="bg-slate-800 border border-slate-700 w-full max-w-lg rounded-2xl p-6 relative max-h-[80vh] overflow-y-auto">
+            <h3 class="text-xl font-bold text-white mb-3">Privacy Policy</h3>
+            <div class="space-y-3 text-xs text-slate-300 leading-relaxed">
+                <p>Your privacy is important to us. DecisionMaker.io does not store custom choices or user data on
+                    external servers; all spin calculations occur directly within your web browser.</p>
+                <p>We use third-party advertising companies (such as Google AdSense) to serve ads when you visit our
+                    website. These companies may use information about your visits to provide relevant advertisements.
+                </p>
+            </div>
+            <button onclick="closeModal('privacyModal')"
+                class="mt-6 w-full py-2.5 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg text-sm">Close</button>
+        </div>
+    </div>
+
+    <div id="contactModal"
+        class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div
+            class="bg-slate-800 border border-slate-700 w-full max-w-lg rounded-2xl p-6 relative max-h-[80vh] overflow-y-auto">
+            <h3 class="text-xl font-bold text-white mb-3">Contact Us</h3>
+            <p class="text-sm text-slate-300 mb-4">Have feedback, bug reports, or feature requests? Reach out to our
+                team directly.</p>
+            <div
+                class="p-3 bg-slate-900 rounded-lg border border-slate-700 text-center text-sm text-indigo-400 font-mono">
+                support@decisionmaker.io
+            </div>
+            <button onclick="closeModal('contactModal')"
+                class="mt-6 w-full py-2.5 bg-slate-700 hover:bg-slate-600 text-white font-semibold rounded-lg text-sm">Close</button>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="toast"
+        class="fixed bottom-5 right-5 bg-emerald-600 text-white px-4 py-2 rounded-lg shadow-xl text-xs font-bold transition transform translate-y-20 opacity-0 pointer-events-none z-50">
+        Result copied to clipboard!
+    </div>
+
+    <!-- JavaScript Logic -->
+    <script>
+        const canvas = document.getElementById('wheelCanvas');
+        const ctx = canvas.getContext('2d');
+        const spinBtn = document.getElementById('spinBtn');
+        const updateBtn = document.getElementById('updateBtn');
+        const optionsInput = document.getElementById('optionsInput');
+        const resultBox = document.getElementById('resultBox');
+        const resultText = document.getElementById('resultText');
+
+        let options = optionsInput.value.split(',').map(item => item.trim());
+        let startAngle = 0;
+        let arc = Math.PI / (options.length / 2);
+        let spinTimeout = null;
+        let spinAngleStart = 0;
+        let spinTime = 0;
+        let spinTimeTotal = 0;
+        let isSpinning = false;
+        let lastSegmentIndex = null;
+
+        const colors = ['#6366f1', '#a855f7', '#ec4899', '#3b82f6', '#14b8a6', '#f59e0b'];
+
+        // Web Audio API Sound Synthesizer
+        let audioCtx = null;
+        function getAudioContext() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            return audioCtx;
+        }
+
+        function playClickSound() {
+            try {
+                const ca = getAudioContext();
+                const osc = ca.createOscillator();
+                const gain = ca.createGain();
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(400, ca.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(80, ca.currentTime + 0.04);
+                gain.gain.setValueAtTime(0.15, ca.currentTime);
+                gain.gain.linearRampToValueAtTime(0.01, ca.currentTime + 0.04);
+                osc.connect(gain);
+                gain.connect(ca.destination);
+                osc.start();
+                osc.stop(ca.currentTime + 0.04);
+            } catch (e) { }
+        }
+
+        function playTriumphSound() {
+            try {
+                const ca = getAudioContext();
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((note, index) => {
+                    const osc = ca.createOscillator();
+                    const gain = ca.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(note, ca.currentTime + index * 0.08);
+                    gain.gain.setValueAtTime(0, ca.currentTime + index * 0.08);
+                    gain.gain.linearRampToValueAtTime(0.2, ca.currentTime + index * 0.08 + 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.001, ca.currentTime + index * 0.08 + 0.3);
+                    osc.connect(gain);
+                    gain.connect(ca.destination);
+                    osc.start(ca.currentTime + index * 0.08);
+                    osc.stop(ca.currentTime + index * 0.08 + 0.3);
+                });
+            } catch (e) { }
+        }
+
+        function drawWheel() {
+            arc = Math.PI / (options.length / 2);
+            ctx.clearRect(0, 0, 340, 340);
+
+            let outsideRadius = 150;
+            let textRadius = 100;
+            let insideRadius = 0;
+
+            for (let i = 0; i < options.length; i++) {
+                let angle = startAngle + i * arc;
+                ctx.fillStyle = colors[i % colors.length];
+
+                ctx.beginPath();
+                ctx.arc(170, 170, outsideRadius, angle, angle + arc, false);
+                ctx.arc(170, 170, insideRadius, angle + arc, angle, true);
+                ctx.stroke();
+                ctx.fill();
+
+                ctx.save();
+                ctx.fillStyle = "white";
+                ctx.translate(170 + Math.cos(angle + arc / 2) * textRadius,
+                    170 + Math.sin(angle + arc / 2) * textRadius);
+                ctx.rotate(angle + arc / 2 + Math.PI / 2);
+                let text = options[i];
+                ctx.font = 'bold 13px sans-serif';
+                ctx.fillText(text, -ctx.measureText(text).width / 2, 0);
+                ctx.restore();
+            }
+        }
+
+        function rotateWheel() {
+            spinTime += 30;
+            if (spinTime >= spinTimeTotal) {
+                stopRotateWheel();
+                return;
+            }
+            let spinAngle = spinAngleStart - easeOut(spinTime, 0, spinAngleStart, spinTimeTotal);
+            startAngle += (spinAngle * Math.PI / 180);
+
+            let degrees = startAngle * 180 / Math.PI + 90;
+            let arcd = arc * 180 / Math.PI;
+            let currentSegmentIndex = Math.floor((360 - degrees % 360) / arcd) % options.length;
+
+            if (currentSegmentIndex !== lastSegmentIndex) {
+                playClickSound();
+                lastSegmentIndex = currentSegmentIndex;
+            }
+
+            drawWheel();
+            spinTimeout = setTimeout(rotateWheel, 30);
+        }
+
+        function stopRotateWheel() {
+            clearTimeout(spinTimeout);
+            let degrees = startAngle * 180 / Math.PI + 90;
+            let arcd = arc * 180 / Math.PI;
+            let index = Math.floor((360 - degrees % 360) / arcd) % options.length;
+
+            let winningChoice = options[index];
+            resultText.innerText = winningChoice;
+            resultBox.classList.remove('hidden');
+
+            playTriumphSound();
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+
+            isSpinning = false;
+            spinBtn.disabled = false;
+        }
+
+        function easeOut(t, b, c, d) {
+            let ts = (t /= d) * t;
+            let tc = ts * t;
+            return b + c * (tc + (-3 * ts + 3 * t));
+        }
+
+        spinBtn.addEventListener('click', () => {
+            if (isSpinning) return;
+            isSpinning = true;
+            spinBtn.disabled = true;
+            resultBox.classList.add('hidden');
+
+            spinAngleStart = Math.random() * 10 + 10;
+            spinTime = 0;
+            spinTimeTotal = Math.random() * 3000 + 4000;
+            rotateWheel();
+        });
+
+        updateBtn.addEventListener('click', () => {
+            let val = optionsInput.value.trim();
+            if (val) {
+                options = val.split(',').map(item => item.trim()).filter(Boolean);
+                if (options.length < 2) {
+                    alert("Please enter at least 2 options!");
+                    return;
+                }
+                drawWheel();
+            }
+        });
+
+        // Modal Controls
+        function openModal(id) {
+            document.getElementById(id).classList.remove('hidden');
+        }
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        // Universal Clipboard & Share Utility (HTTP & HTTPS safe)
+        function copyTextToClipboard(text) {
+            if (navigator.clipboard && window.isSecureContext) {
+                return navigator.clipboard.writeText(text);
+            } else {
+                // Legacy fallback for non-HTTPS network testing (e.g. 192.168.x.x)
+                return new Promise((resolve, reject) => {
+                    const textArea = document.createElement("textarea");
+                    textArea.value = text;
+                    textArea.style.position = "fixed";  // Avoid scrolling to bottom
+                    textArea.style.opacity = "0";
+                    document.body.appendChild(textArea);
+                    textArea.focus();
+                    textArea.select();
+                    try {
+                        const successful = document.execCommand('copy');
+                        document.body.removeChild(textArea);
+                        if (successful) resolve();
+                        else reject(new Error('execCommand copy failed'));
+                    } catch (err) {
+                        document.body.removeChild(textArea);
+                        reject(err);
+                    }
+                });
+            }
+        }
+
+        function copyResultText() {
+            const text = `The decision wheel landed on: ${resultText.innerText}! Checked via DecisionMaker.io`;
+            copyTextToClipboard(text).then(() => {
+                showToast();
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        }
+
+        function shareResult() {
+            const text = `The decision wheel landed on: "${resultText.innerText}"! Try it yourself on DecisionMaker.io`;
+            if (navigator.share) {
+                navigator.share({
+                    title: 'DecisionMaker.io Result',
+                    text: text,
+                    url: window.location.href,
+                }).catch(() => { });
+            } else {
+                copyResultText();
+            }
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2500);
+        }
+
+        // Initial draw
+        drawWheel();
+    </script>
+</body>
+
+</html>
